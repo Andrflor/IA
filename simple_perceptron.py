@@ -15,9 +15,9 @@ class Perceptron:
         self.func=func
 
     def display(self, matrix):
-        print("Compute: %.4f" % p.compute(matrix))
-        print("Weights: %.4f, %.4f" % (p.weights[0], p.weights[1]))
-        print("Bias: ", p.bias)
+        print("Compute: %.4f" % self.compute(matrix))
+        print("Weights: %.4f, %.4f" % (self.weights[0], self.weights[1]))
+        print("Bias: ", self.bias)
 
     def get_eq(self):
         return -self.weights[0]/self.weights[1], -self.bias/self.weights[1]
