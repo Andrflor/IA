@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 from random import random, uniform
-from math import exp
+from function import sigmoid
 
-def sigmoid(x):
-    if x< -10: return 0
-    return 1/(1+exp(-x))
-
+#Simple perceptron based on basic linear algebra
+#This is just an implementation from intuition
+#This model is not scalable to complex multilayer perceptron sctructure
 class Perceptron:
 
     def __init__(self, func=sigmoid):

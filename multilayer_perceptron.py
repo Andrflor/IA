@@ -4,6 +4,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from keras.datasets import mnist
 from math import exp
 
+#Use https://intoli.com/blog/neural-network-initialization/ to setup base weights
+
 def relu(x):
     if x<0:
         return 0
