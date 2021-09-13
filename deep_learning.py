@@ -98,23 +98,14 @@ class DeepLearning:
     def train_all(self, X, Y, epoch=300, batch=10):
         print("Training model for %i epochs" % epoch)
         for i in range(epoch):
-            for j in range(len(X)):
-                x = X[j]
-                y = Y[j]
-                self.train(x, y)
+            self.train(X, Y)
         print("Training model ended")
 
     def accuracy(self, X, Y):
-        counter = 0
-        for i in range(len(X)):
-            x = X[i]
-            y = Y[i]
-            got_right = self.predict(x) == y
-            if got_right:
-                counter += 1
 
-        acc = (counter/len(X))*100
+        acc = 100*(1-np.sum(np.absolute(self.predict(X) - Y))/Y.shape[1])
         print("Model accuracy is: %.01f percents" % acc)
+
         return acc
 
 # Load bank forgery dataset
@@ -125,7 +116,7 @@ def train_test_split(filename):
         data = f.readlines()
     for i in range(len(data)):
         info = [float(point) for point in data[i].split(",")]
-        X.append(np.transpose([info[:-1]]))
+        X.append(np.transpose(info[:-1]))
         Y.append(np.transpose([info[-1]]))
 
     # Shuffle for random order off class
@@ -134,10 +125,10 @@ def train_test_split(filename):
 
     # Split in 1/3 - 2/3
     split = len(X)//3
-    X_test = X[:split]
-    X_train = X[split:]
-    Y_test = Y[:split]
-    Y_train = Y[split:]
+    X_test = np.transpose(np.array(X[:split]))
+    X_train = np.transpose(np.array(X[split:]))
+    Y_test = np.transpose(np.array(Y[:split]))
+    Y_train = np.transpose(np.array(Y[split:]))
 
     return X_train, Y_train, X_test, Y_test
 
@@ -150,7 +141,7 @@ def test_algo(filename, l1, l2, epoch=300, batch=1):
     X_train, Y_train, X_test, Y_test = train_test_split(filename)
 
     # Initialising model with correct size
-    algo = DeepLearning(X_train[0].shape[0], l1, l2, Y_train[0].shape[0])
+    algo = DeepLearning(X_train.shape[0], l1, l2, Y_train.shape[0])
 
     # Test basic accuracy, should be around 50%
     first_run = algo.accuracy(X_test, Y_test)
@@ -166,9 +157,9 @@ def test_algo(filename, l1, l2, epoch=300, batch=1):
 
 if __name__ == '__main__':
     # The result should be around 65% according to both dataset structure
-    test_algo("diabetes", 9, 30, 50)
-    test_algo("ionosphere", 9, 30, 50)
-    test_algo("titanic", 9, 30, 50)
+    test_algo("diabetes", 9, 30, 500)
+    test_algo("ionosphere", 9, 30, 500)
+    test_algo("titanic", 9, 30, 500)
 
     # Try to run it multiple times you will see that shuffle randomness
     # and init randomness can easly change the percentage
