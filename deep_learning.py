@@ -25,12 +25,13 @@ class DeepLearning:
         self.startscale = 0.01
 
         # Learning rate
-        self.alpha = 0.001
+        self.alpha = 0.01
+        self.decay_rate = 0.01
 
-        # Init weight matrices
-        self.w1 = np.random.randn(l1size, insize)*self.startscale
-        self.w2 = np.random.randn(l2size, l1size)*self.startscale
-        self.w3 = np.random.randn(l3size, l2size)*self.startscale
+        # Init weight matrices with variance of 1/n[l-1]
+        self.w1 = np.random.randn(l1size, insize)*np.sqrt(1/insize)
+        self.w2 = np.random.randn(l2size, l1size)*np.sqrt(1/l1size)
+        self.w3 = np.random.randn(l3size, l2size)*np.sqrt(1/l2size)
 
         # Init vector biases
         self.b1 = np.zeros((l1size, 1))
@@ -61,7 +62,7 @@ class DeepLearning:
         return np.round(self.fit(x))
 
     # Train the algorithm
-    def train(self, x, y):
+    def train(self, x, y, epoch=0):
 
         # Coeff for training by batch
         c = 1/x.shape[0]
@@ -85,20 +86,22 @@ class DeepLearning:
         dw1 = c*np.matmul(dz1, np.transpose(x))
         db1 = c*np.sum(dz1, axis=1, keepdims=True)
 
+        alpha = self.alpha/(1+self.decay_rate*epoch)
+
         # Updating weights
-        self.w1 -= self.alpha*dw1
-        self.w2 -= self.alpha*dw2
-        self.w3 -= self.alpha*dw3
+        self.w1 -= alpha*dw1
+        self.w2 -= alpha*dw2
+        self.w3 -= alpha*dw3
 
         # Updating biases
-        self.b1 -= self.alpha*db1
-        self.b2 -= self.alpha*db2
-        self.b3 -= self.alpha*db3
+        self.b1 -= alpha*db1
+        self.b2 -= alpha*db2
+        self.b3 -= alpha*db3
 
     def train_all(self, X, Y, epoch=300, batch=10):
         print("Training model for %i epochs" % epoch)
         for i in range(epoch):
-            self.train(X, Y)
+            self.train(X, Y, i)
         print("Training model ended")
 
     def accuracy(self, X, Y):
@@ -170,7 +173,7 @@ def test_algo(filename, l1, l2, epoch=300, batch=1):
     print("Model increased performace by %.02f percents" % (second_run-first_run))
 
 if __name__ == '__main__':
-    # The result should be more than 65% according to all 3 dataset structure
-    test_algo("diabetes", 9, 30, 500)
-    test_algo("ionosphere", 9, 30, 500)
-    test_algo("titanic", 9, 30, 500)
+    # The result should be more than 75%
+    test_algo("diabetes", 9, 30, 2000)
+    test_algo("ionosphere", 9, 30, 2000)
+    test_algo("titanic", 9, 30, 2000)
