@@ -122,10 +122,15 @@ def train_test_split(filename):
 
     X = np.transpose(np.array(XY)[:,:-1])
 
-    # Center and reduction
+    # Center and reduce
+    var = np.var(X, axis=1)
+    to_del = np.where(var == 0)[0]
+
+    for elt in to_del:
+        X = np.delete(X, elt, 0)
+        var = np.delete(var, elt, 0)
+
     means = np.sum(X, axis=1)/X.shape[1]
-    # The little add prevent devinding by 0
-    var = np.var(X, axis=1)+0.000000001
 
     X = X - np.broadcast_to(np.transpose([means]), X.shape)
     X = X/np.broadcast_to(np.transpose([var]), X.shape)
