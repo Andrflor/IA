@@ -124,7 +124,8 @@ def train_test_split(filename):
 
     # Center and reduction
     means = np.sum(X, axis=1)/X.shape[1]
-    var = np.var(X, axis=1)+0.0000000001
+    # The little add prevent devinding by 0
+    var = np.var(X, axis=1)+0.000000001
 
     X = X - np.broadcast_to(np.transpose([means]), X.shape)
     X = X/np.broadcast_to(np.transpose([var]), X.shape)
