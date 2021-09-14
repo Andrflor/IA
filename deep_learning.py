@@ -110,25 +110,33 @@ class DeepLearning:
 
 # Load bank forgery dataset
 def train_test_split(filename):
-    X = []
-    Y = []
+    XY = []
     with open(filename) as f:
         data = f.readlines()
     for i in range(len(data)):
         info = [float(point) for point in data[i].split(",")]
-        X.append(np.transpose(info[:-1]))
-        Y.append(np.transpose([info[-1]]))
+        XY.append(info)
 
-    # Shuffle for random order off class
-    random.shuffle(X)
-    random.shuffle(Y)
+    # Random shuffle for the train test split with a seed to get same results
+    random.Random(0).shuffle(XY)
+
+    X = np.transpose(np.array(XY)[:,:-1])
+
+    # Center and reduction
+    means = np.sum(X, axis=1)/X.shape[1]
+    var = np.var(X, axis=1)+0.0000000001
+
+    X = X - np.broadcast_to(np.transpose([means]), X.shape)
+    X = X/np.broadcast_to(np.transpose([var]), X.shape)
+
+    Y = np.transpose(np.array(XY)[:, -1:])
 
     # Split in 1/3 - 2/3
-    split = len(X)//3
-    X_test = np.transpose(np.array(X[:split]))
-    X_train = np.transpose(np.array(X[split:]))
-    Y_test = np.transpose(np.array(Y[:split]))
-    Y_train = np.transpose(np.array(Y[split:]))
+    split = X.shape[1]//3
+    X_test = X[:, :split]
+    X_train = X[:, split:]
+    Y_test = Y[:, :split]
+    Y_train = Y[:, split:]
 
     return X_train, Y_train, X_test, Y_test
 
@@ -156,11 +164,7 @@ def test_algo(filename, l1, l2, epoch=300, batch=1):
     print("Model increased performace by %.02f percents" % (second_run-first_run))
 
 if __name__ == '__main__':
-    # The result should be around 65% according to both dataset structure
+    # The result should be more than 65% according to all 3 dataset structure
     test_algo("diabetes", 9, 30, 500)
     test_algo("ionosphere", 9, 30, 500)
     test_algo("titanic", 9, 30, 500)
-
-    # Try to run it multiple times you will see that shuffle randomness
-    # and init randomness can easly change the percentage
-    # in all cases it should have a final at more than 50%
