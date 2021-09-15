@@ -21,12 +21,9 @@ class DeepLearning:
         self.l2size = l2size
         self.l3size = l3size
 
-        # Initial scailing
-        self.startscale = 0.01
-
         # Learning rate
         self.alpha = 0.01
-        self.decay_rate = 0.01
+        self.decay_rate = 0.001
 
         # Init weight matrices with variance of 1/n[l-1]
         self.w1 = np.random.randn(l1size, insize)*np.sqrt(1/insize)
@@ -111,7 +108,23 @@ class DeepLearning:
 
         return acc
 
-# Load bank forgery dataset
+# Batch normalisation
+def normalize(vect, axis=1):
+    var = np.sqrt(np.var(vect, axis=axis))+0.00000001
+    means = np.sum(vect, axis=axis)/vect.shape[axis]
+
+    if axis == 1:
+        vect = vect - np.broadcast_to(np.transpose([means]), vect.shape)
+        vect = vect/np.broadcast_to(np.transpose([var]), vect.shape)
+
+    else:
+        vect = vect - np.broadcast_to([means], vect.shape)
+        vect = vect/np.broadcast_to([var], vect.shape)
+
+
+    return vect
+
+# Load any formatted dataset
 def train_test_split(filename):
     XY = []
     with open(filename) as f:
@@ -122,21 +135,10 @@ def train_test_split(filename):
 
     # Random shuffle for the train test split with a seed to get same results
     random.Random(0).shuffle(XY)
-
     X = np.transpose(np.array(XY)[:,:-1])
 
     # Center and reduce
-    var = np.var(X, axis=1)
-    to_del = np.where(var == 0)[0]
-
-    for elt in to_del:
-        X = np.delete(X, elt, 0)
-        var = np.delete(var, elt, 0)
-
-    means = np.sum(X, axis=1)/X.shape[1]
-
-    X = X - np.broadcast_to(np.transpose([means]), X.shape)
-    X = X/np.broadcast_to(np.transpose([var]), X.shape)
+    X = normalize(X)
 
     Y = np.transpose(np.array(XY)[:, -1:])
 
@@ -174,6 +176,8 @@ def test_algo(filename, l1, l2, epoch=300, batch=1):
 
 if __name__ == '__main__':
     # The result should be more than 75%
-    test_algo("diabetes", 9, 30, 2000)
-    test_algo("ionosphere", 9, 30, 2000)
-    test_algo("titanic", 9, 30, 2000)
+    test_algo("diabetes", 7, 7, 2000)
+    # The result should be around 90%
+    test_algo("ionosphere", 7, 7, 2000)
+    # The result should be more than 75%
+    test_algo("titanic", 7, 7, 2000)
