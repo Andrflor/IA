@@ -44,7 +44,7 @@ def test_model(filename):
     X_train, X_test, Y_train, Y_test = load_data(filename)
     model = BinaryClass()
 
-    model.fit(X_train, Y_train, epochs=2000, verbose=0)
+    model.fit(X_train, Y_train, epochs=500, verbose=0)
     score, acc = model.evaluate(X_test, Y_test, verbose=0)
 
     print('Test accuracy:', acc)

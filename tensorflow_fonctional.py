@@ -67,22 +67,26 @@ def plot_metric(title, metric_name, history, ylim=5):
     plt.plot(history.history["val_"+metric_name], color='g', label="val_"+metric_name)
     plt.show()
 
-
-# Model testing
-def test_model(filename):
-
-    print("\nTesting model for file:", filename)
-    X_train, X_test, Y_train, Y_test = load_data(filename)
-
-    model = build_model()
-
-    # Showing model form
+# Showing model form
+def show_model(model):
     plot_model(model, show_shapes=True, show_layer_names=True)
     print(model.summary())
     img = mpimg.imread("model.png")
     plt.imshow(img)
     plt.axis('off')
     plt.show()
+
+
+# Model testing
+def test_model(filename):
+
+    # Loading everything
+    print("\nTesting model for file:", filename)
+    X_train, X_test, Y_train, Y_test = load_data(filename)
+
+    # Building and showing result
+    model = build_model()
+    show_model(model)
 
     input("Press any key to process training...")
 
